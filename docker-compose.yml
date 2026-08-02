@@ -1,0 +1,130 @@
+# ============================================================
+# docker-compose.yml – Enterprise Selenium Framework
+# Phase 7: CI/CD Integration & Containerization
+# ============================================================
+#
+# Quick Start Commands:
+#   docker-compose up smoke              → Run smoke tests
+#   docker-compose up regression         → Run full regression
+#   docker-compose up crossbrowser       → Run cross-browser suite
+#   docker-compose --profile grid up     → Start Selenium Grid + run tests
+#
+# All reports are written to ./reports/ on the host machine.
+# ============================================================
+
+version: "3.9"
+
+# ── Shared defaults to avoid repetition ─────────────────────
+x-base-service: &base-service
+  build:
+    context: .
+    dockerfile: Dockerfile
+  volumes:
+    # Mount reports directory so test results persist after container exits
+    - ./reports:/app/reports
+  environment:
+    - HEADLESS=true
+  restart: "no"
+
+# ── Network ─────────────────────────────────────────────────
+networks:
+  selenium-grid:
+    driver: bridge
+
+services:
+
+  # ──────────────────────────────────────────────────────────
+  # Smoke Tests – Chrome Headless
+  # Usage: docker-compose up smoke
+  # ──────────────────────────────────────────────────────────
+  smoke:
+    <<: *base-service
+    container_name: selenium-smoke
+    environment:
+      - SUITE=testng-smoke.xml
+      - ENV=staging
+      - BROWSER=chrome
+      - HEADLESS=true
+
+  # ──────────────────────────────────────────────────────────
+  # Regression Tests – Chrome Headless
+  # Usage: docker-compose up regression
+  # ──────────────────────────────────────────────────────────
+  regression:
+    <<: *base-service
+    container_name: selenium-regression
+    environment:
+      - SUITE=testng-regression.xml
+      - ENV=staging
+      - BROWSER=chrome
+      - HEADLESS=true
+
+  # ──────────────────────────────────────────────────────────
+  # Cross-Browser Tests
+  # Usage: docker-compose up crossbrowser
+  # ──────────────────────────────────────────────────────────
+  crossbrowser:
+    <<: *base-service
+    container_name: selenium-crossbrowser
+    environment:
+      - SUITE=testng-crossbrowser.xml
+      - ENV=staging
+      - BROWSER=chrome
+      - HEADLESS=true
+
+  # ──────────────────────────────────────────────────────────
+  # Selenium Grid Hub (optional – profile: grid)
+  # ──────────────────────────────────────────────────────────
+  selenium-hub:
+    image: selenium/hub:4.27.0
+    container_name: selenium-hub
+    profiles:
+      - grid
+    ports:
+      - "4442:4442"   # Event bus publish
+      - "4443:4443"   # Event bus subscribe
+      - "4444:4444"   # Grid UI & WebDriver endpoint
+    networks:
+      - selenium-grid
+
+  # ──────────────────────────────────────────────────────────
+  # Chrome Node (attached to Grid)
+  # ──────────────────────────────────────────────────────────
+  chrome-node:
+    image: selenium/node-chrome:4.27.0
+    container_name: selenium-chrome-node
+    profiles:
+      - grid
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_SESSION_TIMEOUT=300
+      - START_XVFB=false
+    shm_size: "2gb"
+    networks:
+      - selenium-grid
+
+  # ──────────────────────────────────────────────────────────
+  # Firefox Node (attached to Grid)
+  # ──────────────────────────────────────────────────────────
+  firefox-node:
+    image: selenium/node-firefox:4.27.0
+    container_name: selenium-firefox-node
+    profiles:
+      - grid
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_SESSION_TIMEOUT=300
+      - START_XVFB=false
+    shm_size: "2gb"
+    networks:
+      - selenium-grid

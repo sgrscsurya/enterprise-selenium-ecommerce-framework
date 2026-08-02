@@ -1,0 +1,5 @@
+username,password,expectedErrorMessage
+invalid_user1,wrong_pass,Epic sadface: Username and password do not match any user in this service
+user_test,12345,Epic sadface: Username and password do not match any user in this service
+,secret_sauce,Epic sadface: Username is required
+standard_user,,Epic sadface: Password is required

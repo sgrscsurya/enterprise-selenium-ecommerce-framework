@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.saucedemo</groupId>
+    <artifactId>enterprise-selenium-ecommerce-framework</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>enterprise-selenium-ecommerce-framework</name>
+    <description>Enterprise Grade Selenium Automation Framework for SauceDemo</description>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Dependency Versions -->
+        <selenium.version>4.28.0</selenium.version>
+        <testng.version>7.10.2</testng.version>
+        <extentreports.version>5.1.2</extentreports.version>
+        <log4j.version>2.24.3</log4j.version>
+        <poi.version>5.4.0</poi.version>
+        <webdrivermanager.version>5.9.2</webdrivermanager.version>
+        <commons-io.version>2.18.0</commons-io.version>
+        <jackson.version>2.18.2</jackson.version>
+        <opencsv.version>5.9</opencsv.version>
+        <maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+
+        <!--
+          Phase 7: Dynamic Suite Configuration
+          Override via command line: mvn test -DsuiteFile=testng-smoke.xml
+          Supported values: testng.xml | testng-smoke.xml | testng-sanity.xml | testng-regression.xml | testng-crossbrowser.xml
+        -->
+        <suiteFile>testng.xml</suiteFile>
+
+        <!--
+          Phase 7/8: Environment Selection
+          Override via command line: mvn test -Denv=qa
+          Supported values: local | dev | qa | uat | staging | prod
+        -->
+        <env>local</env>
+
+        <!--
+          Phase 7: Browser Selection
+          Override via command line: mvn test -Dbrowser=firefox
+          Supported values: chrome | firefox | edge
+        -->
+        <browser>chrome</browser>
+
+        <!--
+          Phase 7: Headless Mode
+          Override via command line: mvn test -Dheadless=true
+        -->
+        <headless>false</headless>
+    </properties>
+
+    <dependencies>
+        <!-- Selenium Java -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+
+        <!-- Extent Reports -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
+
+        <!-- Log4j Core & API -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- Apache POI for Excel Read/Write -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <!-- WebDriverManager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>${webdrivermanager.version}</version>
+        </dependency>
+
+        <!-- Apache Commons IO – used by ScreenshotUtility for dynamic file-based screenshots -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
+
+        <!-- Jackson Databind – powers JSONReader for JSON-driven test data -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- OpenCSV – powers CSVReader for CSV-driven test data -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${opencsv.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!--
+              Maven Surefire Plugin
+              Phase 7 Enhancement:
+                - ${suiteFile} is resolved at build time, enabling any suite to run
+                  without editing this file.
+                - systemPropertyVariables propagate env, browser, headless to EnvironmentManager
+                  and BrowserFactory so JVM properties work transparently inside tests.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>${suiteFile}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <!-- Pass Maven properties through as JVM system properties -->
+                    <systemPropertyVariables>
+                        <env>${env}</env>
+                        <browser>${browser}</browser>
+                        <headless>${headless}</headless>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--
+      Phase 7: Build Profiles
+      Usage examples:
+        mvn test -Psmoke               → runs smoke suite locally (Chrome)
+        mvn test -Pregression          → runs full regression locally (Chrome)
+        mvn test -Pcrossbrowser        → Chrome + Firefox + Edge in parallel
+        mvn test -Pchrome              → Chrome only, smoke suite
+        mvn test -Pfirefox             → Firefox only, smoke suite
+        mvn test -Pedge                → Edge only, smoke suite
+        mvn test -Pci-staging          → headless smoke on staging
+        mvn test -Pci-regression       → headless full regression on staging
+        mvn test -Pci-crossbrowser     → headless cross-browser on staging
+        mvn test -Pci-dev              → headless smoke on dev
+        mvn test -Pci-qa               → headless smoke on qa
+        mvn test -Pci-uat              → headless regression on uat
+    -->
+    <profiles>
+
+        <!-- Smoke Profile – fast sanity check (local, headed) -->
+        <profile>
+            <id>smoke</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>local</env>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Sanity Profile – post-deploy sanity check (local, headed) -->
+        <profile>
+            <id>sanity</id>
+            <properties>
+                <suiteFile>testng-sanity.xml</suiteFile>
+                <env>local</env>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Regression Profile – full coverage (local, headed) -->
+        <profile>
+            <id>regression</id>
+            <properties>
+                <suiteFile>testng-regression.xml</suiteFile>
+                <env>local</env>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Cross-Browser Profile – Chrome + Firefox + Edge in parallel (3 threads) -->
+        <profile>
+            <id>crossbrowser</id>
+            <properties>
+                <suiteFile>testng-crossbrowser.xml</suiteFile>
+                <env>local</env>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Chrome-Only Profile – smoke suite on Chrome -->
+        <profile>
+            <id>chrome</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>local</env>
+                <browser>chrome</browser>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Firefox-Only Profile – smoke suite on Firefox -->
+        <profile>
+            <id>firefox</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>local</env>
+                <browser>firefox</browser>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- Edge-Only Profile – smoke suite on Microsoft Edge -->
+        <profile>
+            <id>edge</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>local</env>
+                <browser>edge</browser>
+                <headless>false</headless>
+            </properties>
+        </profile>
+
+        <!-- CI Smoke Profile – headless smoke against staging -->
+        <profile>
+            <id>ci-staging</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>staging</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- CI Regression Profile – headless full regression against staging -->
+        <profile>
+            <id>ci-regression</id>
+            <properties>
+                <suiteFile>testng-regression.xml</suiteFile>
+                <env>staging</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- CI Cross-Browser Profile – headless cross-browser (Chrome+Firefox+Edge) on staging -->
+        <profile>
+            <id>ci-crossbrowser</id>
+            <properties>
+                <suiteFile>testng-crossbrowser.xml</suiteFile>
+                <env>staging</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- CI Dev Profile – headless smoke against dev -->
+        <profile>
+            <id>ci-dev</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>dev</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- CI QA Profile – headless smoke against qa -->
+        <profile>
+            <id>ci-qa</id>
+            <properties>
+                <suiteFile>testng-smoke.xml</suiteFile>
+                <env>qa</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- CI UAT Profile – headless regression against uat -->
+        <profile>
+            <id>ci-uat</id>
+            <properties>
+                <suiteFile>testng-regression.xml</suiteFile>
+                <env>uat</env>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>

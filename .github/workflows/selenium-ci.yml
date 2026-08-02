@@ -1,0 +1,332 @@
+name: "🚀 Selenium CI Pipeline"
+
+# ============================================================
+# Phase 7 – Trigger Strategy
+# ============================================================
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "release/**"
+  pull_request:
+    branches:
+      - main
+      - develop
+  # Manual trigger with runtime inputs
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "TestNG suite to execute"
+        required: true
+        default: "testng-smoke.xml"
+        type: choice
+        options:
+          - testng.xml
+          - testng-smoke.xml
+          - testng-regression.xml
+          - testng-crossbrowser.xml
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - local
+          - staging
+          - prod
+      browser:
+        description: "Browser (single-browser suites only)"
+        required: true
+        default: "chrome"
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
+
+# Cancel in-progress runs on the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # ============================================================
+  # Job 1 – Build & Validate
+  # Compiles main + test sources. Gate for all downstream jobs.
+  # ============================================================
+  build:
+    name: "📦 Build & Validate"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "⬇️ Checkout"
+        uses: actions/checkout@v4
+
+      - name: "☕ Set Up JDK 17"
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: "🔧 Compile Main Sources"
+        run: mvn compile -B --no-transfer-progress
+
+      - name: "🔧 Compile Test Sources"
+        run: mvn test-compile -B --no-transfer-progress
+
+  # ============================================================
+  # Job 2 – Smoke Tests (Chrome, Headless)
+  # Runs on every push and pull_request after build passes.
+  # ============================================================
+  smoke-tests:
+    name: "💨 Smoke Tests – Chrome"
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+      - name: "🖥️ Install Chrome"
+        uses: browser-actions/setup-chrome@v1
+
+      - name: "🧪 Run Smoke Suite"
+        run: |
+          mvn test \
+            -DsuiteFile=testng-smoke.xml \
+            -Denv=staging \
+            -Dbrowser=chrome \
+            -Dheadless=true \
+            -B --no-transfer-progress
+        env:
+          ENV: staging
+
+      - name: "📊 Upload Extent Report"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-smoke-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+
+      - name: "📸 Upload Screenshots on Failure"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-smoke-failure-${{ github.run_number }}
+          path: reports/screenshots/
+          retention-days: 7
+
+  # ============================================================
+  # Job 3 – Cross-Browser Tests (Chrome + Firefox + Edge)
+  # Uses a matrix strategy so each browser runs as an independent
+  # job in parallel, giving per-browser pass/fail visibility.
+  # Runs only on main/develop pushes (after smoke passes).
+  # ============================================================
+  cross-browser-tests:
+    name: "🌐 Cross-Browser – ${{ matrix.browser }}"
+    runs-on: ubuntu-latest
+    needs: smoke-tests
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    strategy:
+      fail-fast: false        # Don't cancel other browsers if one fails
+      matrix:
+        browser: [chrome, firefox]   # Edge headless not supported on Linux runners
+        # To add more browsers simply append to the list above
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: "🖥️ Install Chrome"
+        if: matrix.browser == 'chrome'
+        uses: browser-actions/setup-chrome@v1
+
+      - name: "🦊 Install Firefox"
+        if: matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
+
+      - name: "🧪 Run Smoke Suite – ${{ matrix.browser }}"
+        run: |
+          mvn test \
+            -DsuiteFile=testng-smoke.xml \
+            -Denv=staging \
+            -Dbrowser=${{ matrix.browser }} \
+            -Dheadless=true \
+            -B --no-transfer-progress
+        env:
+          ENV: staging
+
+      - name: "📊 Upload Extent Report – ${{ matrix.browser }}"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-${{ matrix.browser }}-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+
+      - name: "📸 Upload Screenshots on Failure – ${{ matrix.browser }}"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.browser }}-failure-${{ github.run_number }}
+          path: reports/screenshots/
+          retention-days: 7
+
+  # ============================================================
+  # Job 4 – Full Regression (Chrome, Headless)
+  # Runs only when a PR is merged to main (after cross-browser).
+  # ============================================================
+  regression-tests:
+    name: "🔬 Full Regression – Chrome"
+    runs-on: ubuntu-latest
+    needs: cross-browser-tests
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+      - name: "🖥️ Install Chrome"
+        uses: browser-actions/setup-chrome@v1
+
+      - name: "🧪 Run Regression Suite"
+        run: |
+          mvn test \
+            -DsuiteFile=testng-regression.xml \
+            -Denv=staging \
+            -Dbrowser=chrome \
+            -Dheadless=true \
+            -B --no-transfer-progress
+        env:
+          ENV: staging
+
+      - name: "📊 Upload Extent Report"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-regression-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+
+      - name: "📸 Upload Screenshots on Failure"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-regression-failure-${{ github.run_number }}
+          path: reports/screenshots/
+          retention-days: 14
+
+  # ============================================================
+  # Job 5 – Edge Smoke (Windows runner)
+  # Edge is only available on GitHub-hosted Windows runners.
+  # Runs in parallel with Job 4 for fast per-browser feedback.
+  # ============================================================
+  edge-smoke:
+    name: "🔷 Smoke Tests – Edge (Windows)"
+    runs-on: windows-latest
+    needs: smoke-tests
+    if: >
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+      # Edge is pre-installed on Windows runners; WebDriverManager handles the driver
+
+      - name: "🧪 Run Smoke Suite – Edge"
+        run: |
+          mvn test `
+            -DsuiteFile=testng-smoke.xml `
+            -Denv=staging `
+            -Dbrowser=edge `
+            -Dheadless=true `
+            -B --no-transfer-progress
+        env:
+          ENV: staging
+
+      - name: "📊 Upload Extent Report – Edge"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-edge-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+
+      - name: "📸 Upload Screenshots on Failure – Edge"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-edge-failure-${{ github.run_number }}
+          path: reports/screenshots/
+          retention-days: 7
+
+  # ============================================================
+  # Job 6 – Manual / Workflow Dispatch Run
+  # Triggered only via "Run workflow" button on GitHub UI.
+  # ============================================================
+  manual-run:
+    name: "🎛️ Manual – ${{ github.event.inputs.suite }} (${{ github.event.inputs.browser }})"
+    runs-on: ${{ github.event.inputs.browser == 'edge' && 'windows-latest' || 'ubuntu-latest' }}
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: "🖥️ Install Chrome"
+        if: github.event.inputs.browser == 'chrome'
+        uses: browser-actions/setup-chrome@v1
+
+      - name: "🦊 Install Firefox"
+        if: github.event.inputs.browser == 'firefox'
+        uses: browser-actions/setup-firefox@v1
+      # Edge is pre-installed on windows-latest; no install step needed
+
+      - name: "🧪 Execute Selected Suite"
+        run: |
+          mvn test \
+            -DsuiteFile=${{ github.event.inputs.suite }} \
+            -Denv=${{ github.event.inputs.environment }} \
+            -Dbrowser=${{ github.event.inputs.browser }} \
+            -Dheadless=true \
+            -B --no-transfer-progress
+        shell: bash
+        env:
+          ENV: ${{ github.event.inputs.environment }}
+
+      - name: "📊 Upload Extent Report"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-manual-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+
+      - name: "📸 Upload Screenshots on Failure"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-manual-failure-${{ github.run_number }}
+          path: reports/screenshots/
+          retention-days: 7

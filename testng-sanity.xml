@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+  ============================================================
+  Sanity Suite – Phase 8: Enterprise Enhancements
+  ============================================================
+  Purpose  : Post-deployment sanity check. Broader than smoke
+             (covers login, inventory, cart, and checkout core
+             flows) but lighter than full regression.
+  Execution: mvn test -DsuiteFile=testng-sanity.xml
+  Duration : ~4-6 minutes target
+  ============================================================
+-->
+<suite name="SauceDemo Sanity Suite" parallel="classes" thread-count="3" verbose="1">
+
+    <listeners>
+        <listener class-name="com.saucedemo.listeners.TestListener"/>
+        <listener class-name="com.saucedemo.listeners.AnnotationTransformer"/>
+    </listeners>
+
+    <!-- Browser can be overridden via -Dbrowser=firefox -->
+    <parameter name="browser" value="chrome"/>
+
+    <test name="Sanity - Login">
+        <groups>
+            <run>
+                <include name="sanity"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.saucedemo.tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <test name="Sanity - Inventory">
+        <groups>
+            <run>
+                <include name="sanity"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.saucedemo.tests.InventoryTest"/>
+        </classes>
+    </test>
+
+    <test name="Sanity - Cart">
+        <groups>
+            <run>
+                <include name="sanity"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.saucedemo.tests.CartTest"/>
+        </classes>
+    </test>
+
+    <test name="Sanity - Checkout">
+        <groups>
+            <run>
+                <include name="sanity"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.saucedemo.tests.CheckoutTest"/>
+        </classes>
+    </test>
+
+</suite>

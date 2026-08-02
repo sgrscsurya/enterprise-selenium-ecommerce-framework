@@ -1,0 +1,44 @@
+# Target folder (Maven build output)
+target/
+
+# IDE settings
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs and Reports
+logs/
+test-output/
+reports/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Driver executables (if downloaded locally)
+*.exe
+*.mac
+*.sh
+
+# ── Phase 7: CI/CD & Docker additions ──────────────────────
+
+# Docker
+.docker/
+
+# Local environment overrides (never commit environment-specific secrets)
+.env
+.env.local
+.env.staging
+.env.prod
+
+# WebDriverManager cached drivers
+.wdm/
+
+# Allure / Surefire reports (generated at runtime)
+allure-results/
+allure-report/
+surefire-reports/
