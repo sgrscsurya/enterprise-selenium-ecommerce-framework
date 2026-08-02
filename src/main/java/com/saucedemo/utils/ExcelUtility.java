@@ -88,16 +88,16 @@ public class ExcelUtility {
      * Returns total row count in a given sheet.
      */
     public int getRowCount(String sheetName) {
-        return withSheet(sheetName, 0, Sheet::getLastRowNum);
+        return this.<Integer>withSheet(sheetName, 0, Sheet::getLastRowNum);
     }
 
     /**
      * Returns column count for a specific row in a sheet.
      */
     public int getCellCount(String sheetName, int rowNum) {
-        return withSheet(sheetName, 0, sh -> {
+        return this.<Integer>withSheet(sheetName, 0, sh -> {
             Row row = sh.getRow(rowNum);
-            return (row != null) ? row.getLastCellNum() : 0;
+            return (row != null) ? (int) row.getLastCellNum() : 0;
         });
     }
 
@@ -105,7 +105,7 @@ public class ExcelUtility {
      * Reads a specific cell data value as string.
      */
     public String getCellData(String sheetName, int rowNum, int colNum) {
-        return withSheet(sheetName, "", sh -> {
+        return this.<String>withSheet(sheetName, "", sh -> {
             Row row = sh.getRow(rowNum);
             if (row == null) {
                 return "";

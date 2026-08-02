@@ -3,6 +3,7 @@ package com.saucedemo.pages;
 import com.saucedemo.pages.base.BasePage;
 import com.saucedemo.utils.ElementActions;
 import com.saucedemo.utils.LoggerUtility;
+import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
 
 /**
@@ -44,6 +45,7 @@ public class LoginPage extends BasePage {
     public InventoryPage clickLoginButton() {
         LoggerUtility.info("Clicking Login button...");
         ElementActions.click(loginButton);
+        WaitUtility.waitForUrlContains("inventory");
         return new InventoryPage();
     }
 

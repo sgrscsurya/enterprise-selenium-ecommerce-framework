@@ -2,7 +2,9 @@ package com.saucedemo.pages;
 
 import com.saucedemo.pages.base.BasePage;
 import com.saucedemo.utils.ElementActions;
+import com.saucedemo.utils.JavaScriptUtility;
 import com.saucedemo.utils.LoggerUtility;
+import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
 
 /**
@@ -19,7 +21,7 @@ public class CheckoutPage extends BasePage {
     private final By errorMessageContainer = By.cssSelector("h3[data-test='error']");
 
     public CheckoutPage() {
-        super(PAGE_TITLE);
+        super(By.id("continue"));
     }
 
     public CheckoutPage enterFirstName(String firstName) {
@@ -55,7 +57,9 @@ public class CheckoutPage extends BasePage {
      */
     public CheckoutOverviewPage clickContinue() {
         LoggerUtility.info("Clicking Continue button...");
+        JavaScriptUtility.scrollToElement(continueButton);
         ElementActions.click(continueButton);
+        WaitUtility.waitForUrlContains("checkout-step-two");
         return new CheckoutOverviewPage();
     }
 

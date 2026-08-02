@@ -10,7 +10,7 @@
   Duration : ~2-3 minutes target
   ============================================================
 -->
-<suite name="SauceDemo Smoke Suite" parallel="classes" thread-count="2" verbose="1">
+<suite name="SauceDemo Smoke Suite" parallel="classes" thread-count="1" verbose="1">
 
     <listeners>
         <listener class-name="com.saucedemo.listeners.TestListener"/>

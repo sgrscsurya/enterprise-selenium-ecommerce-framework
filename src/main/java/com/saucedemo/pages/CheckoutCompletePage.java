@@ -16,7 +16,7 @@ public class CheckoutCompletePage extends BasePage {
     private final By backHomeButton = By.id("back-to-products");
 
     public CheckoutCompletePage() {
-        super(PAGE_TITLE);
+        super(By.id("back-to-products"));
     }
 
     /**

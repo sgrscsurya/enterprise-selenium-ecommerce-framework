@@ -26,9 +26,15 @@ public class ElementActions {
         // Prevent instantiation
     }
 
-    /** Waits for clickability, then clicks the element. */
+    /** Waits for clickability, then clicks the element (with JS click fallback). */
     public static void click(By locator) {
-        WaitUtility.waitForClickability(locator).click();
+        WebElement element = WaitUtility.waitForClickability(locator);
+        try {
+            element.click();
+        } catch (Exception e) {
+            LoggerUtility.warn("Standard click failed for locator '" + locator + "', falling back to JavaScript click: " + e.getMessage());
+            JavaScriptUtility.clickElementViaJS(element);
+        }
     }
 
     /**

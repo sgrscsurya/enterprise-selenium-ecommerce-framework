@@ -3,7 +3,9 @@ package com.saucedemo.pages;
 import com.saucedemo.pages.base.BasePage;
 import com.saucedemo.pages.components.HeaderComponent;
 import com.saucedemo.utils.ElementActions;
+import com.saucedemo.utils.JavaScriptUtility;
 import com.saucedemo.utils.LoggerUtility;
+import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class CartPage extends BasePage {
     private final By checkoutButton = By.id("checkout");
 
     public CartPage() {
-        super(PAGE_TITLE);
+        super(By.id("checkout"));
         this.headerComponent = new HeaderComponent();
     }
 
@@ -61,7 +63,9 @@ public class CartPage extends BasePage {
      */
     public CheckoutPage clickCheckout() {
         LoggerUtility.info("Clicking 'Checkout' button...");
+        JavaScriptUtility.scrollToElement(checkoutButton);
         ElementActions.click(checkoutButton);
+        WaitUtility.waitForUrlContains("checkout-step-one");
         return new CheckoutPage();
     }
 }

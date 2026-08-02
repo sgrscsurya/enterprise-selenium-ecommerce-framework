@@ -11,7 +11,7 @@
   Duration : ~4-6 minutes target
   ============================================================
 -->
-<suite name="SauceDemo Sanity Suite" parallel="classes" thread-count="3" verbose="1">
+<suite name="SauceDemo Sanity Suite" parallel="classes" thread-count="2" verbose="1">
 
     <listeners>
         <listener class-name="com.saucedemo.listeners.TestListener"/>

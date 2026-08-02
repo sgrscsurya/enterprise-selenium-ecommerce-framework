@@ -2,7 +2,9 @@ package com.saucedemo.pages;
 
 import com.saucedemo.pages.base.BasePage;
 import com.saucedemo.utils.ElementActions;
+import com.saucedemo.utils.JavaScriptUtility;
 import com.saucedemo.utils.LoggerUtility;
+import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
 
 import java.util.List;
@@ -21,7 +23,7 @@ public class CheckoutOverviewPage extends BasePage {
     private final By cancelButton = By.id("cancel");
 
     public CheckoutOverviewPage() {
-        super(PAGE_TITLE);
+        super(By.id("finish"));
     }
 
     public List<String> getItemNamesList() {
@@ -60,7 +62,9 @@ public class CheckoutOverviewPage extends BasePage {
      */
     public CheckoutCompletePage clickFinish() {
         LoggerUtility.info("Clicking Finish button...");
+        JavaScriptUtility.scrollToElement(finishButton);
         ElementActions.click(finishButton);
+        WaitUtility.waitForUrlContains("checkout-complete");
         return new CheckoutCompletePage();
     }
 

@@ -23,7 +23,7 @@ public class AdvancedInteractionsTest extends BaseTest {
 
     private InventoryPage inventoryPage;
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void loginToInventory() {
         LoginPage loginPage = new LoginPage();
         inventoryPage = loginPage.login(FrameworkConstants.STANDARD_USER, FrameworkConstants.STANDARD_PASSWORD);

@@ -2,6 +2,7 @@ package com.saucedemo.pages.components;
 
 import com.saucedemo.utils.ElementActions;
 import com.saucedemo.utils.LoggerUtility;
+import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
 
 /**
@@ -49,11 +50,12 @@ public class HeaderComponent {
     }
 
     /**
-     * Opens the slide-out hamburger side menu.
+     * Opens the slide-out hamburger side menu and waits for items to be visible.
      */
     public void openSideMenu() {
         LoggerUtility.info("Opening side menu...");
         ElementActions.click(menuButton);
+        WaitUtility.waitForVisibility(logoutSidebarLink);
     }
 
     /**
@@ -62,6 +64,7 @@ public class HeaderComponent {
     public void clickLogout() {
         openSideMenu();
         LoggerUtility.info("Clicking Logout link in sidebar...");
+        WaitUtility.waitForClickability(logoutSidebarLink);
         ElementActions.click(logoutSidebarLink);
     }
 

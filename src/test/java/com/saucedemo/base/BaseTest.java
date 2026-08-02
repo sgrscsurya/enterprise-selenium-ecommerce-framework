@@ -43,7 +43,7 @@ import java.time.Duration;
  */
 public class BaseTest {
 
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     public void setUpSuite() {
         LoggerUtility.info("=================================================================");
         LoggerUtility.info("  Enterprise Selenium Framework – Initializing Test Suite");
@@ -65,7 +65,7 @@ public class BaseTest {
      *
      * @param browserParam browser parameter injected by TestNG; empty string if not provided
      */
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     @Parameters({"browser"})
     public void setUp(@Optional("") String browserParam) {
         // Resolve browser: TestNG param > JVM system property > config file
@@ -112,13 +112,13 @@ public class BaseTest {
         DriverFactory.getDriver().get(targetUrl);
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDown() {
         LoggerUtility.info("Tearing down WebDriver instance for current thread...");
         DriverFactory.quitDriver();
     }
 
-    @AfterSuite
+    @AfterSuite(alwaysRun = true)
     public void tearDownSuite() {
         LoggerUtility.info("Flushing Extent Reports after Suite Execution.");
         ReportManager.flushReports();
