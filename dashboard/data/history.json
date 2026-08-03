@@ -1,0 +1,97 @@
+[
+  {
+    "id": "RUN-1785719170606",
+    "suiteFile": "testng-smoke.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-03T01:06:10.606Z",
+    "status": "PASSED",
+    "endTime": "2026-08-03T01:07:00.064Z",
+    "durationSeconds": 49,
+    "exitCode": 0,
+    "results": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "RUN-1785716628967",
+    "suiteFile": "testng.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-03T00:23:48.967Z",
+    "status": "FAILED",
+    "endTime": "2026-08-03T00:43:35.688Z",
+    "durationSeconds": 1187,
+    "exitCode": 1,
+    "results": {
+      "total": 58,
+      "passed": 33,
+      "failed": 9,
+      "skipped": 16
+    }
+  },
+  {
+    "id": "RUN-1785715542191",
+    "suiteFile": "testng.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-03T00:05:42.191Z",
+    "status": "FAILED",
+    "endTime": "2026-08-03T00:17:46.515Z",
+    "durationSeconds": 724,
+    "exitCode": 1,
+    "results": {
+      "total": 42,
+      "passed": 39,
+      "failed": 3,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "RUN-1785715371256",
+    "suiteFile": "testng-smoke.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-03T00:02:51.256Z",
+    "status": "FAILED",
+    "endTime": "2026-08-03T00:04:21.017Z",
+    "durationSeconds": 90,
+    "exitCode": 1,
+    "results": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "RUN-1785714546572",
+    "suiteFile": "testng.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-02T23:49:06.572Z",
+    "status": "FAILED",
+    "endTime": "2026-08-02T23:59:01.707Z",
+    "durationSeconds": 595,
+    "exitCode": 1,
+    "results": {
+      "total": 42,
+      "passed": 37,
+      "failed": 5,
+      "skipped": 0
+    }
+  }
+]

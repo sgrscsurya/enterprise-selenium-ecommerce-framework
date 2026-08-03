@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Enterprise Selenium Test Automation Dashboard - SauceDemo E-Commerce Framework.">
+  <title>SA Dashboard — Test Operations</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header Banner -->
+    <header class="app-header">
+      <div class="header-brand">
+        <a href="index.html" class="header-logo-link">
+          <div class="logo-img-wrap">
+            <img src="logo.png" alt="SauceDemo SA Logo" class="header-logo-img">
+          </div>
+        </a>
+        <div class="brand-text">
+          <h1>Test Operations Dashboard</h1>
+          <p>SauceDemo E-Commerce · Selenium Automation Platform</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon theme-toggle-icon"></i>
+          <span class="theme-toggle-text">Dark</span>
+        </button>
+        <div class="status-badge" id="systemStatusBadge">
+          <span class="status-dot"></span>
+          <span class="status-text">Connected</span>
+        </div>
+        <div class="runner-badge idle" id="runnerStatusBadge">
+          <i class="fa-solid fa-circle-notch fa-spin runner-spinner hidden" id="runnerSpinner"></i>
+          <span id="runnerStateText">IDLE</span>
+        </div>
+        <!-- Mobile hamburger -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-tab="control-center">
+        <i class="fa-solid fa-play"></i>
+        <span>Control Center</span>
+      </button>
+      <button class="nav-tab" data-tab="reports">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Reports</span>
+      </button>
+      <button class="nav-tab" data-tab="screenshots">
+        <i class="fa-solid fa-images"></i>
+        <span>Screenshots</span>
+      </button>
+      <button class="nav-tab" data-tab="history">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>History</span>
+      </button>
+      <button class="nav-tab" data-tab="logs">
+        <i class="fa-solid fa-file-code"></i>
+        <span>Logs</span>
+      </button>
+    </nav>
+
+    <!-- Tab 1: Control Center -->
+    <main class="tab-content active" id="tab-control-center">
+      <div class="control-grid">
+        <!-- Suite Selector + Settings Panel -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2><i class="fa-solid fa-layer-group"></i> Select Test Suite</h2>
+          </div>
+
+          <div class="suites-grid">
+            <div class="suite-card active" data-suite="testng.xml">
+              <div class="suite-card-top">
+                <i class="fa-solid fa-border-all"></i>
+                <span class="badge">FULL</span>
+              </div>
+              <h3>All Test Suites</h3>
+              <p>testng.xml — Complete suite across all features and pages</p>
+            </div>
+            <div class="suite-card" data-suite="testng-smoke.xml">
+              <div class="suite-card-top">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+                <span class="badge">SMOKE</span>
+              </div>
+              <h3>Smoke Suite</h3>
+              <p>testng-smoke.xml — Quick critical path validation</p>
+            </div>
+            <div class="suite-card" data-suite="testng-sanity.xml">
+              <div class="suite-card-top">
+                <i class="fa-solid fa-check-double"></i>
+                <span class="badge">SANITY</span>
+              </div>
+              <h3>Sanity Suite</h3>
+              <p>testng-sanity.xml — Product, cart and form verification</p>
+            </div>
+            <div class="suite-card" data-suite="testng-regression.xml">
+              <div class="suite-card-top">
+                <i class="fa-solid fa-cubes"></i>
+                <span class="badge">REGRESSION</span>
+              </div>
+              <h3>Regression Suite</h3>
+              <p>testng-regression.xml — Deep end-to-end coverage</p>
+            </div>
+            <div class="suite-card" data-suite="testng-crossbrowser.xml">
+              <div class="suite-card-top">
+                <i class="fa-solid fa-globe"></i>
+                <span class="badge">CROSS</span>
+              </div>
+              <h3>Cross-Browser</h3>
+              <p>testng-crossbrowser.xml — Chrome, Firefox and Edge matrix</p>
+            </div>
+          </div>
+
+          <!-- Execution Settings -->
+          <div class="settings-section">
+            <h3 class="settings-title"><i class="fa-solid fa-sliders"></i> Configuration</h3>
+            <div class="settings-grid">
+              <!-- Headless Toggle -->
+              <div class="setting-item">
+                <label class="setting-label">Execution Mode</label>
+                <div class="toggle-row">
+                  <span class="toggle-label"><i class="fa-solid fa-eye-slash"></i> Headless</span>
+                  <label class="switch">
+                    <input type="checkbox" id="headlessToggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <small class="setting-hint">OFF = visible browser window</small>
+              </div>
+
+              <!-- Browser -->
+              <div class="setting-item">
+                <label class="setting-label">Browser</label>
+                <div class="custom-dropdown" id="dropdownBrowser" data-value="chrome">
+                  <button type="button" class="dropdown-trigger">
+                    <i class="fa-brands fa-chrome dropdown-trigger-icon" id="browserTriggerIcon"></i>
+                    <span class="dropdown-selected-text" id="browserSelectedText">Google Chrome</span>
+                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <div class="dropdown-item selected" data-value="chrome" data-icon="fa-brands fa-chrome">
+                      <i class="fa-brands fa-chrome"></i> Google Chrome
+                    </div>
+                    <div class="dropdown-item" data-value="firefox" data-icon="fa-brands fa-firefox-browser">
+                      <i class="fa-brands fa-firefox-browser"></i> Mozilla Firefox
+                    </div>
+                    <div class="dropdown-item" data-value="edge" data-icon="fa-brands fa-edge">
+                      <i class="fa-brands fa-edge"></i> Microsoft Edge
+                    </div>
+                  </div>
+                  <select id="browserSelect" class="hidden-select">
+                    <option value="chrome" selected>Google Chrome</option>
+                    <option value="firefox">Mozilla Firefox</option>
+                    <option value="edge">Microsoft Edge</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Environment -->
+              <div class="setting-item">
+                <label class="setting-label">Environment</label>
+                <div class="custom-dropdown" id="dropdownEnv" data-value="local">
+                  <button type="button" class="dropdown-trigger">
+                    <i class="fa-solid fa-laptop-code dropdown-trigger-icon" id="envTriggerIcon"></i>
+                    <span class="dropdown-selected-text" id="envSelectedText">Local</span>
+                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                  </button>
+                  <div class="dropdown-menu">
+                    <div class="dropdown-item selected" data-value="local" data-icon="fa-solid fa-laptop-code">
+                      <i class="fa-solid fa-laptop-code"></i> Local
+                    </div>
+                    <div class="dropdown-item" data-value="qa" data-icon="fa-solid fa-vial">
+                      <i class="fa-solid fa-vial"></i> QA
+                    </div>
+                    <div class="dropdown-item" data-value="staging" data-icon="fa-solid fa-layer-group">
+                      <i class="fa-solid fa-layer-group"></i> Staging
+                    </div>
+                    <div class="dropdown-item" data-value="prod" data-icon="fa-solid fa-shield-halved">
+                      <i class="fa-solid fa-shield-halved"></i> Production
+                    </div>
+                  </div>
+                  <select id="envSelect" class="hidden-select">
+                    <option value="local" selected>Local</option>
+                    <option value="qa">QA</option>
+                    <option value="staging">Staging</option>
+                    <option value="prod">Production</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-bar">
+              <button class="btn btn-white" id="runTestBtn">
+                <i class="fa-solid fa-rocket"></i> Run Test Suite
+              </button>
+              <button class="btn btn-outline-red" id="stopTestBtn" disabled>
+                <i class="fa-solid fa-hand"></i> Abort
+              </button>
+              <button class="btn btn-outline" id="clearConsoleBtn">
+                <i class="fa-solid fa-eraser"></i> Clear
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Live Console Terminal -->
+        <section class="panel console-panel">
+          <div class="panel-header">
+            <h2><i class="fa-solid fa-terminal"></i> Live Console</h2>
+            <div class="console-actions">
+              <span class="live-dot-wrap"><span class="live-dot"></span> LIVE</span>
+              <button class="icon-btn" id="copyConsoleBtn" title="Copy"><i class="fa-solid fa-copy"></i></button>
+              <button class="icon-btn active" id="autoScrollBtn" title="Auto-scroll"><i class="fa-solid fa-arrow-down"></i></button>
+            </div>
+          </div>
+          <div class="terminal" id="terminalBody">
+            <div class="log-sys">=== Ready. Select a suite above and click Run. ===</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Tab 2: Reports -->
+    <main class="tab-content" id="tab-reports">
+      <div class="tab-header-bar">
+        <div>
+          <h2><i class="fa-solid fa-chart-line"></i> Extent Reports</h2>
+          <p class="tab-sub">Interactive HTML report from <code>reports/ExtentReport.html</code></p>
+        </div>
+        <div class="tab-actions">
+          <button class="btn btn-outline" id="refreshReportBtn"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+          <a href="/reports-static/ExtentReport.html" target="_blank" class="btn btn-white"><i class="fa-solid fa-arrow-up-right-from-square"></i> Full Window</a>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <iframe id="reportIframe" src="/reports-static/ExtentReport.html" title="Extent Report"></iframe>
+      </div>
+    </main>
+
+    <!-- Tab 3: Screenshots -->
+    <main class="tab-content" id="tab-screenshots">
+      <div class="tab-header-bar">
+        <div>
+          <h2><i class="fa-solid fa-camera"></i> Screenshots Gallery</h2>
+          <p class="tab-sub">Evidence from <code>reports/screenshots/</code></p>
+        </div>
+        <button class="btn btn-outline" id="refreshScreenshotsBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      </div>
+      <div class="screenshots-grid" id="screenshotsGrid"></div>
+    </main>
+
+    <!-- Tab 4: History -->
+    <main class="tab-content" id="tab-history">
+      <div class="tab-header-bar">
+        <div>
+          <h2><i class="fa-solid fa-history"></i> Execution Records</h2>
+          <p class="tab-sub">Audit trail of all dashboard-triggered test runs</p>
+        </div>
+        <div class="tab-actions">
+          <button class="btn btn-outline" id="refreshHistoryBtn"><i class="fa-solid fa-sync"></i> Refresh</button>
+          <button class="btn btn-outline-red" id="clearHistoryBtn"><i class="fa-solid fa-trash-can"></i> Clear</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Run ID</th>
+              <th>Suite</th>
+              <th>Mode</th>
+              <th>Browser</th>
+              <th>Env</th>
+              <th>Status</th>
+              <th>Results</th>
+              <th>Duration</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Tab 5: Logs -->
+    <main class="tab-content" id="tab-logs">
+      <div class="tab-header-bar">
+        <div>
+          <h2><i class="fa-solid fa-file-lines"></i> System Logs</h2>
+          <p class="tab-sub">Log4j automation log from <code>logs/automation.log</code></p>
+        </div>
+        <button class="btn btn-outline" id="refreshLogFileBtn"><i class="fa-solid fa-arrows-rotate"></i> Reload</button>
+      </div>
+      <div class="log-viewer">
+        <pre id="logFileContent">Loading log file...</pre>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="modal hidden" id="imageModal">
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-inner">
+      <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+      <img id="modalImage" src="" alt="Screenshot">
+      <div class="modal-cap" id="modalCaption"></div>
+    </div>
+  </div>
+
+  <!-- Custom Dialog Box (Replaces native browser alert/confirm popups) -->
+  <div class="modal hidden" id="dialogModal">
+    <div class="modal-overlay" id="dialogOverlay"></div>
+    <div class="dialog-box">
+      <div class="dialog-header">
+        <div class="dialog-icon" id="dialogIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 id="dialogTitle">Confirmation</h3>
+      </div>
+      <p class="dialog-message" id="dialogMessage">Are you sure you want to proceed?</p>
+      <div class="dialog-actions">
+        <button class="btn btn-outline" id="dialogCancelBtn">Cancel</button>
+        <button class="btn btn-white" id="dialogConfirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
