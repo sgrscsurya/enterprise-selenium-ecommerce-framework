@@ -26,6 +26,17 @@ public class WaitUtility {
         // Prevent instantiation
     }
 
+    /**
+     * Pauses thread execution safely for specified milliseconds (used for UI animations).
+     */
+    public static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private static WebDriverWait getWait() {
         WebDriver driver = DriverFactory.getDriver();
         int timeoutSeconds = ConfigReader.getIntProperty("explicit.wait");
@@ -35,6 +46,18 @@ public class WaitUtility {
     private static WebDriverWait getWait(int customTimeoutInSeconds) {
         WebDriver driver = DriverFactory.getDriver();
         return new WebDriverWait(driver, Duration.ofSeconds(customTimeoutInSeconds));
+    }
+
+    /**
+     * Waits for element visibility with custom timeout, returning boolean status without throwing.
+     */
+    public static boolean waitForVisibilityWithTimeout(By locator, int timeoutInSeconds) {
+        try {
+            getWait(timeoutInSeconds).until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.saucedemo.pages.components;
 
 import com.saucedemo.utils.ElementActions;
+import com.saucedemo.utils.JavaScriptUtility;
 import com.saucedemo.utils.LoggerUtility;
 import com.saucedemo.utils.WaitUtility;
 import org.openqa.selenium.By;
@@ -33,8 +34,11 @@ public class HeaderComponent {
      */
     public int getCartBadgeCount() {
         if (!ElementActions.isPresent(shoppingCartBadge)) {
-            LoggerUtility.info("No cart badge present. Item count is 0.");
-            return 0;
+            // Wait up to 2 seconds for badge to appear if item was just added
+            if (!WaitUtility.waitForVisibilityWithTimeout(shoppingCartBadge, 2)) {
+                LoggerUtility.info("No cart badge present. Item count is 0.");
+                return 0;
+            }
         }
         String countText = ElementActions.getText(shoppingCartBadge);
         LoggerUtility.info("Cart badge count retrieved: " + countText);
@@ -56,6 +60,8 @@ public class HeaderComponent {
         LoggerUtility.info("Opening side menu...");
         ElementActions.click(menuButton);
         WaitUtility.waitForVisibility(logoutSidebarLink);
+        WaitUtility.waitForClickability(logoutSidebarLink);
+        WaitUtility.sleep(400); // Allow slide-in animation to complete
     }
 
     /**
@@ -64,8 +70,14 @@ public class HeaderComponent {
     public void clickLogout() {
         openSideMenu();
         LoggerUtility.info("Clicking Logout link in sidebar...");
-        WaitUtility.waitForClickability(logoutSidebarLink);
-        ElementActions.click(logoutSidebarLink);
+        JavaScriptUtility.clickElementViaJS(logoutSidebarLink);
+        try {
+            WaitUtility.waitForVisibility(By.id("login-button"));
+        } catch (Exception e) {
+            LoggerUtility.warn("JS logout click delayed, retrying standard click...");
+            ElementActions.click(logoutSidebarLink);
+            WaitUtility.waitForVisibility(By.id("login-button"));
+        }
     }
 
     /**

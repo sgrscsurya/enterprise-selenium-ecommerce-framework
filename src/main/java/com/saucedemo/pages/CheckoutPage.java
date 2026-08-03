@@ -58,8 +58,15 @@ public class CheckoutPage extends BasePage {
     public CheckoutOverviewPage clickContinue() {
         LoggerUtility.info("Clicking Continue button...");
         JavaScriptUtility.scrollToElement(continueButton);
-        ElementActions.click(continueButton);
-        WaitUtility.waitForUrlContains("checkout-step-two");
+        WaitUtility.waitForClickability(continueButton);
+        JavaScriptUtility.clickElementViaJS(continueButton);
+        try {
+            WaitUtility.waitForUrlContains("checkout-step-two");
+        } catch (Exception e) {
+            LoggerUtility.warn("JS click did not trigger URL change immediately, retrying standard click...");
+            ElementActions.click(continueButton);
+            WaitUtility.waitForUrlContains("checkout-step-two");
+        }
         return new CheckoutOverviewPage();
     }
 

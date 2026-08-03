@@ -64,7 +64,13 @@ public class CheckoutOverviewPage extends BasePage {
         LoggerUtility.info("Clicking Finish button...");
         JavaScriptUtility.scrollToElement(finishButton);
         ElementActions.click(finishButton);
-        WaitUtility.waitForUrlContains("checkout-complete");
+        try {
+            WaitUtility.waitForUrlContains("checkout-complete");
+        } catch (Exception e) {
+            LoggerUtility.warn("Standard click did not complete navigation, retrying via JS click...");
+            JavaScriptUtility.clickElementViaJS(finishButton);
+            WaitUtility.waitForUrlContains("checkout-complete");
+        }
         return new CheckoutCompletePage();
     }
 

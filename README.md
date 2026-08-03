@@ -9,6 +9,7 @@ A production-grade, cross-browser, parallel test automation framework built with
 - [Technology Stack](#-technology-stack)
 - [Framework Architecture](#-framework-architecture)
 - [Project Structure](#-project-structure)
+- [Web Dashboard (UI Platform)](#-web-dashboard-ui-platform)
 - [Quick Start](#-quick-start)
 - [Running Tests](#-running-tests)
   - [Maven Commands](#maven-commands)
@@ -148,6 +149,31 @@ enterprise-selenium-ecommerce-framework/
         │   └── AdvancedInteractionsTest.java
         └── utils/ExcelDataInitializer.java
 ```
+
+---
+
+## 🖥 Web Dashboard (UI Platform)
+
+Instead of running Maven test commands manually in terminal/cmd, you can use the built-in **Web Operations Dashboard** to visually control, execute, and analyze test runs.
+
+### Features
+- ⚡ **Suite Selection**: Execute `testng.xml` (Full), `testng-smoke.xml`, `testng-sanity.xml`, `testng-regression.xml`, or `testng-crossbrowser.xml` with a single click.
+- 👁 **Headed vs. Headless Mode**: Toggle browser visibility on/off directly from the UI.
+- 🌐 **Browser & Environment Controls**: Switch between Chrome, Firefox, Edge, and target local/qa/staging/prod environments.
+- 📡 **Real-Time Live Console**: Stream Maven build `stdout` / `stderr` live via Server-Sent Events (SSE).
+- 📊 **Extent Reports Viewer**: View interactive ExtentReports right inside the dashboard.
+- 📸 **Screenshots & Evidence Gallery**: Visual grid of test failure screenshots with lightbox image preview.
+- 📜 **Audit History**: Track previous runs, status (PASSED/FAILED), durations, and exact parameters.
+
+### Launching the Dashboard
+- **1-Click Launch (Windows)**: Double click `start-dashboard.bat`
+- **Command Line**:
+  ```bash
+  cd dashboard
+  npm install
+  npm start
+  ```
+- **Access Dashboard**: Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
