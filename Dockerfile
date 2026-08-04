@@ -1,14 +1,17 @@
 FROM maven:3.9.6-eclipse-temurin-17
 
-# Install Node.js 20 & Chromium driver for headless Selenium in Linux cloud environments
-RUN apt-get update && apt-get install -y \
+# Install Node.js 20 & Chromium for headless Selenium in Linux cloud environments
+# Note: on recent Debian/Ubuntu bases, chromedriver ships inside the "chromium"
+# package itself, so a separate "chromium-driver" package no longer exists there
+# and would fail the install with an unmet-dependency error.
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg \
     wget \
     chromium \
-    chromium-driver \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Chrome / Chromedriver environment variables for Linux container
