@@ -1,5 +1,43 @@
 [
   {
+    "id": "RUN-1785869568390",
+    "suiteFile": "testng-smoke.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-04T18:52:48.390Z",
+    "status": "PASSED",
+    "endTime": "2026-08-04T18:53:04.306Z",
+    "durationSeconds": 16,
+    "exitCode": 0,
+    "results": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
+    "id": "RUN-1785868680678",
+    "suiteFile": "testng.xml",
+    "headless": true,
+    "browser": "chrome",
+    "env": "local",
+    "grid": false,
+    "startTime": "2026-08-04T18:38:00.678Z",
+    "status": "PASSED",
+    "endTime": "2026-08-04T18:42:24.323Z",
+    "durationSeconds": 264,
+    "exitCode": 0,
+    "results": {
+      "total": 42,
+      "passed": 42,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  {
     "id": "RUN-1785862752270",
     "suiteFile": "testng.xml",
     "headless": true,

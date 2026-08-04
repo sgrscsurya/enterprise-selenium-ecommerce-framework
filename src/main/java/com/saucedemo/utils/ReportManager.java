@@ -58,6 +58,10 @@ public class ReportManager {
                     ".dashboard-view .row { display: flex !important; flex-wrap: wrap !important; } " +
                     ".dashboard-view .card { margin-bottom: 16px !important; width: 100% !important; } " +
                     "canvas { max-width: 100% !important; height: auto !important; } " +
+                    "/* View Switching (self-contained, does not depend on external CDN CSS) */ " +
+                    ".main-content > .view { display: none !important; } " +
+                    ".main-content > .view.active { display: block !important; } " +
+                    ".main-content > .test-view.active, .main-content > .category-view.active { display: flex !important; } " +
                     "/* Dark Theme (Default) */ " +
                     "body, body.dark, .dark .spark-app, body.theme-dark { background-color: #000000 !important; color: #ffffff !important; } " +
                     "body.dark .vheader, body.theme-dark .vheader, body.dark .header.navbar { background-color: #0d0d0d !important; border-bottom: 1px solid #222222 !important; } " +
@@ -133,33 +137,21 @@ public class ReportManager {
                     "}";
 
             String customJs = "window.toggleView = function(viewName) {" +
-                    "  var testView = document.querySelector('.test-view');" +
-                    "  var dashboardView = document.querySelector('.dashboard-view');" +
-                    "  var categoryView = document.querySelector('.category-view');" +
-                    "  if (viewName === 'dashboard-view' || viewName === 'category-view') {" +
-                    "    if (testView) testView.style.setProperty('display', 'none', 'important');" +
-                    "    if (categoryView) categoryView.style.setProperty('display', 'none', 'important');" +
-                    "    if (dashboardView) {" +
-                    "      dashboardView.style.setProperty('display', 'block', 'important');" +
-                    "      dashboardView.classList.add('active');" +
-                    "    }" +
-                    "  } else {" +
-                    "    if (dashboardView) dashboardView.style.setProperty('display', 'none', 'important');" +
-                    "    if (categoryView) categoryView.style.setProperty('display', 'none', 'important');" +
-                    "    if (testView) {" +
-                    "      testView.style.setProperty('display', 'flex', 'important');" +
-                    "      testView.classList.add('active');" +
-                    "    }" +
+                    "  var views = document.querySelectorAll('.main-content > .view');" +
+                    "  views.forEach(function(v) {" +
+                    "    v.classList.remove('active');" +
+                    "  });" +
+                    "  var target = document.querySelector('.main-content > .' + viewName);" +
+                    "  if (target) {" +
+                    "    target.classList.add('active');" +
                     "  }" +
                     "  var navItems = document.querySelectorAll('.side-nav-menu li');" +
                     "  navItems.forEach(function(item) {" +
-                    "    var onclickAttr = item.getAttribute('onclick') || '';" +
                     "    var aTag = item.querySelector('a');" +
                     "    var aId = aTag ? aTag.id : '';" +
-                    "    if (onclickAttr.indexOf(viewName) !== -1 || " +
-                    "       (viewName === 'dashboard-view' && aId === 'nav-dashboard') || " +
-                    "       (viewName === 'test-view' && aId === 'nav-test') || " +
-                    "       (viewName === 'category-view' && aId === 'nav-category')) {" +
+                    "    if ((viewName === 'dashboard-view' && aId === 'nav-dashboard') || " +
+                    "        (viewName === 'test-view' && aId === 'nav-test') || " +
+                    "        (viewName === 'category-view' && aId === 'nav-category')) {" +
                     "      item.classList.add('active');" +
                     "    } else {" +
                     "      item.classList.remove('active');" +
@@ -179,16 +171,15 @@ public class ReportManager {
                     "  }" +
                     "});" +
                     "document.addEventListener('click', function(e) {" +
-                    "  var target = e.target.closest('#nav-dashboard, #nav-test, #nav-category, .side-nav-menu li');" +
+                    "  var target = e.target.closest('#nav-dashboard, #nav-test, #nav-category');" +
                     "  if (target) {" +
                     "    e.preventDefault();" +
                     "    e.stopPropagation();" +
-                    "    var onclick = target.getAttribute('onclick') || '';" +
-                    "    if (target.id === 'nav-dashboard' || onclick.indexOf('dashboard') !== -1) {" +
+                    "    if (target.id === 'nav-dashboard') {" +
                     "      window.toggleView('dashboard-view');" +
-                    "    } else if (target.id === 'nav-category' || onclick.indexOf('category') !== -1) {" +
-                    "      window.toggleView('dashboard-view');" +
-                    "    } else if (target.id === 'nav-test' || onclick.indexOf('test') !== -1) {" +
+                    "    } else if (target.id === 'nav-category') {" +
+                    "      window.toggleView('category-view');" +
+                    "    } else if (target.id === 'nav-test') {" +
                     "      window.toggleView('test-view');" +
                     "    }" +
                     "  }" +
@@ -196,14 +187,7 @@ public class ReportManager {
                     "document.addEventListener('DOMContentLoaded', function() {" +
                     "  var saved = localStorage.getItem('sa_platform_theme');" +
                     "  if (saved === 'light') { document.body.classList.remove('dark'); document.body.classList.add('standard', 'theme-light'); }" +
-                    "    li.addEventListener('click', function(e) {" +
-                    "      var onclick = li.getAttribute('onclick') || '';" +
-                    "      if (onclick.indexOf('dashboard-view') !== -1) { e.preventDefault(); e.stopPropagation(); toggleView('dashboard-view'); }" +
-                    "      else if (onclick.indexOf('test-view') !== -1) { e.preventDefault(); e.stopPropagation(); toggleView('test-view'); }" +
-                    "      else if (onclick.indexOf('category-view') !== -1) { e.preventDefault(); e.stopPropagation(); toggleView('category-view'); }" +
-                    "    });" +
-                    "  });" +
-                    "  toggleView('test-view');" +
+                    "  window.toggleView('test-view');" +
                     "});";
 
             sparkReporter.config().setCss(customCss);
