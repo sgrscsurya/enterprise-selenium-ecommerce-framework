@@ -307,6 +307,9 @@ document.addEventListener('DOMContentLoaded', () => {
     autoScrollBtn.addEventListener('click', () => {
       autoScroll = !autoScroll;
       autoScrollBtn.classList.toggle('active', autoScroll);
+      if (autoScroll && terminalBody) {
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+      }
     });
   }
 
